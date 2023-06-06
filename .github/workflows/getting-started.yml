@@ -19,4 +19,6 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Run a one-line script
-        run: echo ${{ secrets.PASSWORD }}
+        env: 
+          PASS: ${{ secrets.PASSWORD }}
+        run: echo "$PASS"
