@@ -20,3 +20,22 @@ jobs:
     steps:
       - name: Run a one-line script
         run: echo ${{ secrets.PASSWORD }}
+
+  make_string:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    outputs:
+      output1: ${{ steps.step1.outputs.test }}
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      - name: Create a string to be used by subsequent job
+        id: step1
+        run: echo "::set-output name=test::'hello world'"
+  
+  use_string:
+    runs-on: ubuntu-latest
+    needs: make_string
+    steps:
+      - env:
+          OUTPUT1: ${{needs.make_string.outputs.output1}}
+        run: echo "string from previous job = $OUTPUT1"
