@@ -42,6 +42,6 @@ jobs:
       - env:
           OUTPUT1: ${{ needs.make_string.outputs.output1 }}
         run: |
-          for value in $values: do
+          for value in $values; do
             echo "$OUTPUT1 $value"
           done
