@@ -34,8 +34,11 @@ jobs:
   
   use_string:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        values: [1,2,3,4,5,6,7,8,9,10]
     needs: make_string
     steps:
       - env:
-          OUTPUT1: ${{needs.make_string.outputs.output1}}
-        run: echo "string from previous job = $OUTPUT1"
+          OUTPUT1: ${{ needs.make_string.outputs.output1 }}
+        run: echo "$OUTPUT1 $values"
