@@ -30,7 +30,7 @@ jobs:
     steps:
       - name: Create a string to be used by subsequent job
         id: step1
-        run: echo "name='hello world'" >> $GITHUB_OUTPUT
+        run: echo "name=hello world" >> $GITHUB_OUTPUT
   
   use_string:
     runs-on: ubuntu-latest
