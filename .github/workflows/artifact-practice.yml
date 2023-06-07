@@ -28,7 +28,7 @@ jobs:
     steps:
       - name: Create a string to be used by subsequent job
         id: step1
-        run: echo "hello world" >> file.txt
+        run: echo "hello world" > file.txt
       - name: Upload the string file
         id: step2
         uses: actions/upload-artifact@v3
