@@ -1,6 +1,6 @@
 # This is a basic workflow that extends from the getting-started.yml
 
-name: CI
+name: Artifact
 
 # Controls when the workflow will run
 on:
