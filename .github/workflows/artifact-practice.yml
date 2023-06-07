@@ -15,7 +15,7 @@ jobs:
   # This workflow contains a single job called "simple"
   simple:
     # The type of runner that the job will run on
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -24,7 +24,7 @@ jobs:
 
   make_string:
     # The type of runner that the job will run on
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Create a string to be used by subsequent job
@@ -39,7 +39,7 @@ jobs:
 
   use_string:
     needs: make_string
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         values: [1,2,3,4,5,6,7,8,9,10]
