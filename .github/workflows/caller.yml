@@ -5,4 +5,4 @@ on:
 
 jobs:
     call-workflow-in-local-repo:
-      uses: ./.github/workflows/composite.yml
+      uses: ./.github/workflows/composite.yml@main
