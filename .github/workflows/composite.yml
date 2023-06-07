@@ -2,6 +2,14 @@ name: Composite
 
 on:
     workflow_dispatch:
+    workflow_call:
+        # inputs:
+        #     config-path:
+        #         required: true
+        #         type: string
+        # secrets:
+        #     envPAT:
+        #         required: true
 
 jobs:
   hello_world_job:
