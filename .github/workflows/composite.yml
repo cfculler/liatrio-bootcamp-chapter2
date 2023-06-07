@@ -9,7 +9,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: foo
-        uses: liatrio-bootcamp-composite-actions@v1
+        uses: cfculler/liatrio-bootcamp-composite-actions@v1
         with:
           who-to-greet: 'Carson'
       - run: echo random-number ${{ steps.foo.outputs.random-number }}
