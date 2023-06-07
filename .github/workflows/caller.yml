@@ -4,5 +4,8 @@ on:
     workflow_dispatch:
 
 jobs:
-    call-workflow-in-local-repo:
+    call-composite-in-local-repo:
       uses: cfculler/liatrio-bootcamp-chapter2/.github/workflows/composite.yml@main
+
+    call-artifact-in-local-repo:
+      uses: cfculler/liatrio-bootcamp-chapter2/.github/workflows/artifact-practice.yml@main
