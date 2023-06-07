@@ -9,9 +9,9 @@ jobs:
     name: A job to generate a string
     steps:
       - uses: actions/checkout@v3
-      - id: foo
+      - id: step1
         uses: cfculler/liatrio-bootcamp-composite-actions@v4
         with:
           string-to-print: 'Carson'
       - name: Print string
-        run: echo "Final string is $OUTPUT1"
+        run: echo "Final string is ${{ steps.step1.outputs.output1 }}"
