@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - id: foo
-        uses: cfculler/liatrio-bootcamp-composite-actions@v3
+        uses: cfculler/liatrio-bootcamp-composite-actions@v4
         with:
           string-to-print: 'Carson'
       - name: Print string
