@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-github-cm
+  labels:
+    liatr.io/notifications: github.com
+data:
+  repository: cfculler/liatrio-bootcamp-chapter2
+  environment: dev
+
+---
+
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-slack-cm
+  labels:
+    liatr.io/notifications: slack
+data:
+  environment: dev
+  channelid: U051MMLT2FQ
+
