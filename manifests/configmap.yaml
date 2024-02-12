@@ -19,4 +19,7 @@ metadata:
 data:
   environment: dev
   channelid: U051MMLT2FQ
-  notifications: sync-succeeded,sync-failed,sync-running,sync-status,sync-status-unknown,deployed,health-degraded
+  notifications: |
+    - "sync-succeeded"
+    - "sync-failed"
+    - "deployed"
