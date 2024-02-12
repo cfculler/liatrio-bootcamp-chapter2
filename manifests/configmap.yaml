@@ -20,6 +20,6 @@ data:
   environment: dev
   channelid: U051MMLT2FQ
   notifications: |
-    - "sync-succeeded"
-    - "sync-failed"
-    - "deployed"
+    - sync-succeeded
+    - sync-failed
+    - deployed
