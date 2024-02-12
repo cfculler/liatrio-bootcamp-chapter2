@@ -22,3 +22,8 @@ data:
   notifications:
     - sync-succeeded
     - sync-failed
+    - sync-running
+    - sync-status
+    - sync-status-unknown
+    - deployed
+    - health-degraded
