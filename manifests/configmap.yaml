@@ -20,5 +20,5 @@ data:
   environment: dev
   notifications: |+
     - sync-succeeded
-    - sync-failed
+    - sync-status
   channelid: U051MMLT2FQ
