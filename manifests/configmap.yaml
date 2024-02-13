@@ -16,7 +16,11 @@ metadata:
   name: test-slack-cm
   labels:
     liatr.io/notifications: slack
-data:
+data: |
   environment: dev
   channelid: U051MMLT2FQ
-  notifications: sync-succeeded,sync-failed,sync-status,deployed
+  notifications: 
+    - sync-succeeded
+    - sync-failed
+    - sync-status
+    - deployed
