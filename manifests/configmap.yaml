@@ -20,4 +20,3 @@ data:
   environment: dev
   channelid: U051MMLT2FQ
   notifications: |+
-    - sync-succeeded
