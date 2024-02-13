@@ -18,5 +18,5 @@ metadata:
     liatr.io/notifications: slack
 data: 
   environment: dev
-  channelid: U051MMLT2FQ
   notifications: |+
+  channelid: U051MMLT2FQ
