@@ -18,7 +18,7 @@ metadata:
     liatr.io/notifications: slack
 data: 
   channelid: U051MMLT2FQ
-  environment: bad
+  environment: dev
   notifications: |
     - sync-succeeded
     - sync-failed
