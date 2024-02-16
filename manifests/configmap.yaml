@@ -21,4 +21,4 @@ data:
   environment: dev
   notifications: |+
     - sync-failed
-    - deployed
+    - sync-succeeded
