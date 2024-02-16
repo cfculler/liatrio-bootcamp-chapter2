@@ -22,3 +22,4 @@ data:
   notifications: |+
     - sync-failed
     - sync-succeeded
+    - health-degraded
