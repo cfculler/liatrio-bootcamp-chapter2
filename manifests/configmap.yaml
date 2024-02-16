@@ -19,4 +19,7 @@ metadata:
 data: 
   channelid: U051MMLT2FQ
   environment: bad
-  notifications: deployed,sync-failed,health-degraded
+  notifications:
+    - sync-succeeded
+    - sync-failed
+    - deployed
