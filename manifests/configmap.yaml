@@ -8,15 +8,15 @@ data:
   repository: cfculler/liatrio-bootcamp-chapter2
   environment: dev
 
-# ---
+---
 
-# apiVersion: v1
-# kind: ConfigMap
-# metadata:
-#   name: test-slack-cm
-#   labels:
-#     liatr.io/notifications: slack
-# data: 
-#   channelid: U051MMLT2FQ
-#   environment: dev
-#   notifications: sync-succeeded,sync-failed,sync-running
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: test-slack-cm
+  labels:
+    liatr.io/notifications: slack
+data: 
+  channelid: U051MMLT2FQ
+  environment: dev
+  notifications: sync-succeeded,sync-failed,sync-running
