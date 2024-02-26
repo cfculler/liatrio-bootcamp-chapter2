@@ -54,33 +54,33 @@ jobs:
       #   env:
       #     GH_TOKEN: ${{ steps.generate_token.outputs.token }}
 
-      # - name: Localize Manifests (pr)
-      #   run: |
-      #     mkdir -p .localized/
-      #     ./bin/kustomize localize . .localized/pr
+      - name: Localize Manifests (pr)
+        run: |
+          mkdir -p .localized/
+          ./bin/kustomize localize . .localized/pr
 
-      # - name: Check if build branch exists
-      #   id: build_branch
-      #   run: |
-      #     if git show-ref --quiet refs/heads/build; then
-      #       echo "exists=yes\n" >> $GITHUB_OUTPUT
-      #     else
-      #       echo "exists=no\n" >> $GITHUB_OUTPUT
-      #     fi
+      - name: Check if build branch exists
+        id: build_branch
+        run: |
+          if git show-ref --quiet refs/heads/build; then
+            echo "exists=yes\n" >> $GITHUB_OUTPUT
+          else
+            echo "exists=no\n" >> $GITHUB_OUTPUT
+          fi
 
-      # - uses: actions/checkout@v4
-      #   if: ${{ steps.build_branch.outputs.exists == 'yes' }}
-      #   with:
-      #     ref: 'build'
-      #     path: ".localized/main"
+      - uses: actions/checkout@v4
+        if: ${{ steps.build_branch.outputs.exists == 'yes' }}
+        with:
+          ref: 'build'
+          path: ".localized/main"
 
-      # - name: Localize Manifests (main)
-      #   if: ${{ steps.build_branch.outputs.exists != 'yes' }}
-      #   run: |
-      #     mkdir -p .localized/
-      #     ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
+      - name: Localize Manifests (main)
+        if: ${{ steps.build_branch.outputs.exists != 'yes' }}
+        run: |
+          mkdir -p .localized/
+          ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
 
-      # - uses: int128/diff-action@v1
-      #   with:
-      #     base: .localized/main
-      #     head: .localized/pr
+      - uses: int128/diff-action@v1
+        with:
+          base: .localized/main
+          head: .localized/pr
