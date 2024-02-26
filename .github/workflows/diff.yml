@@ -20,11 +20,18 @@ jobs:
       - name: Code checkout
         uses: actions/checkout@v4
 
+      - name: Cache Go dependencies
+        uses: actions/cache@v2
+        with:
+          path: |
+            go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - uses: actions/setup-go@v4
         with:
           go-version-file: 'go.mod'
-          cache-dependency-path: |
-             go.sum
 
       - name: Install tools.go
         run: |
