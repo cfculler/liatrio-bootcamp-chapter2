@@ -1,0 +1,141 @@
+---
+    name: Test
+    
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    
+    on:
+      push:
+        branches:
+          - '*'
+          - '!build'
+      pull_request:
+        branches:
+          - main
+    
+    permissions:
+      id-token: write
+      contents: read
+      checks: write
+    
+    jobs:
+      kustomize:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Code checkout
+            uses: actions/checkout@v4
+    
+          - name: Generate a token
+            id: generate_token
+            uses: actions/create-github-app-token@v1
+            with:
+              app-id: ${{ vars.APP_ID }}
+              private-key: ${{ secrets.APP_PRIVATE_KEY }}
+              owner: ${{ github.repository_owner }}
+    
+          - name: Use the token
+            run: |
+              git config --global url."https://git:${GH_TOKEN}@github.com".insteadOf https://github.com
+            env:
+              GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+    
+          - uses: int128/kustomize-action@v1
+            name: Test Kustomize Build
+            id: kustomize
+            with:
+              kustomization: "*/*/kustomization.yaml"
+    
+      conftest:
+        runs-on: ubuntu-latest
+        steps:
+          - name: Code checkout
+            uses: actions/checkout@v4
+    
+          - name: configure aws credentials
+            uses: aws-actions/configure-aws-credentials@v3
+            with:
+              role-to-assume: ${{ vars.AWS_IAM_ROLE }}
+              role-session-name: github-actions
+              aws-region: ${{ vars.AWS_REGION }}
+    
+          - name: Cache Go dependencies
+            uses: actions/cache@v2
+            with:
+              path: |
+                go/pkg/mod
+              key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+              restore-keys: |
+                ${{ runner.os }}-go-
+      
+          - uses: actions/setup-go@v4
+            with:
+              go-version-file: 'go.mod'
+              cache-dependency-path: |
+                 go.sum
+    
+          - name: Install tools.go
+            run: |
+              make install-tools
+              export PATH=$(pwd)/bin:$PATH
+    
+          - name: Generate a token
+            id: generate_token
+            uses: actions/create-github-app-token@v1
+            with:
+              app-id: ${{ vars.APP_ID }}
+              private-key: ${{ secrets.APP_PRIVATE_KEY }}
+              owner: ${{ github.repository_owner }}
+    
+          - name: Use the token
+            run: |
+              git config --global url."https://git:${GH_TOKEN}@github.com".insteadOf https://github.com
+            env:
+              GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+    
+          - name: Validate TAG-k8s Policies
+            run: |
+              make test
+    
+          - name: Test Report
+            uses: dorny/test-reporter@v1
+            if: ${{ !cancelled() }}
+            with:
+              name: Test Report
+              # only-summary: true
+              only-summary: false
+              fail-on-error: false
+              path: '*.xml'
+              reporter: java-junit
+    
+      release:
+        runs-on: ubuntu-latest
+        if: github.ref == 'refs/heads/main'
+        steps:
+          - name: Code checkout
+            uses: actions/checkout@v4
+    
+          - uses: actions/setup-go@v4
+            with:
+              go-version-file: 'go.mod'
+              cache-dependency-path: |
+                 go.sum
+    
+          - name: Install tools.go
+            run: |
+              make install-tools
+              export PATH=$(pwd)/bin:$PATH
+    
+          - name: Generate a token
+            id: generate_token
+            uses: actions/create-github-app-token@v1
+            with:
+              app-id: ${{ vars.APP_ID }}
+              private-key: ${{ secrets.APP_PRIVATE_KEY }}
+              owner: ${{ github.repository_owner }}
+    
+          - name: Use the token
+            run: |
+              git config --global url."https://git:${GH_TOKEN}@github.com".insteadOf https://github.com
+            env:
+              GH_TOKEN: ${{ steps.generate_token.outputs.token }}
