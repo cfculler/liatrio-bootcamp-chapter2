@@ -41,24 +41,24 @@ jobs:
           make install-tools
           export PATH=$(pwd)/bin:$PATH
 
-      # - name: Generate a token
-      #   id: generate_token
-      #   uses: actions/create-github-app-token@v1
-      #   with:
-      #     app-id: ${{ vars.APP_ID }}
-      #     private-key: ${{ secrets.APP_PRIVATE_KEY }}
-      #     owner: ${{ github.repository_owner }}
+      - name: Generate a token
+        id: generate_token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ vars.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
 
-      # - name: Use the token
-      #   run: |
-      #     git config --global url."https://git:${GH_TOKEN}@github.com".insteadOf https://github.com
-      #   env:
-      #     GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+      - name: Use the token
+        run: |
+          git config --global url."https://git:${GH_TOKEN}@github.com".insteadOf https://github.com
+        env:
+          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
 
       - name: Localize Manifests (pr)
         run: |
           mkdir -p .localized/
-        # ./bin/kustomize localize . .localized/pr
+          ./bin/kustomize localize . .localized/pr
 
       - name: Check if build branch exists
         id: build_branch
@@ -79,9 +79,9 @@ jobs:
         if: ${{ steps.build_branch.outputs.exists != 'yes' }}
         run: |
           mkdir -p .localized/
-        # ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
+          ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
 
-      # - uses: int128/diff-action@v1
-      #   with:
-      #     base: .localized/main
-      #     head: .localized/pr
+      - uses: int128/diff-action@v1
+        with:
+          base: .localized/main
+          head: .localized/pr
