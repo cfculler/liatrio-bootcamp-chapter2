@@ -41,19 +41,19 @@ jobs:
           make install-tools
           export PATH=$(pwd)/bin:$PATH
 
-      - name: Generate a token
-        id: generate_token
-        uses: actions/create-github-app-token@v1
-        with:
-          app-id: ${{ vars.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
-          owner: ${{ github.repository_owner }}
+      # - name: Generate a token
+      #   id: generate_token
+      #   uses: actions/create-github-app-token@v1
+      #   with:
+      #     app-id: ${{ vars.APP_ID }}
+      #     private-key: ${{ secrets.APP_PRIVATE_KEY }}
+      #     owner: ${{ github.repository_owner }}
 
-      - name: Use the token
-        run: |
-          git config --global url."https://git:${GH_TOKEN}@github.com".insteadOf https://github.com
-        env:
-          GH_TOKEN: ${{ steps.generate_token.outputs.token }}
+      # - name: Use the token
+      #   run: |
+      #     git config --global url."https://git:${GH_TOKEN}@github.com".insteadOf https://github.com
+      #   env:
+      #     GH_TOKEN: ${{ steps.generate_token.outputs.token }}
 
       - name: Localize Manifests (pr)
         run: |
