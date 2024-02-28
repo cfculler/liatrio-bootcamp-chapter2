@@ -75,11 +75,11 @@ jobs:
           ref: 'build'
           path: ".localized/main"
 
-      - name: Localize Manifests (main)
-        if: ${{ steps.build_branch.outputs.exists != 'yes' }}
-        run: |
-          mkdir -p .localized/
-          ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
+      # - name: Localize Manifests (main)
+      #   if: ${{ steps.build_branch.outputs.exists != 'yes' }}
+      #   run: |
+      #     mkdir -p .localized/
+      #     ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
 
       - uses: int128/diff-action@v1
         with:
