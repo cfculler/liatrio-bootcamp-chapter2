@@ -72,7 +72,7 @@ jobs:
       #     mkdir -p .localized/
       #     ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
 
-      - uses: int128/diff-action@v1
+      - uses: liatrio/diff-action@v1
         with:
           base: .localized/main
           head: .localized/pr
