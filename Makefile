@@ -13,13 +13,8 @@ install-tools: download bin
 
 bin:
 	mkdir -p bin
-download:
-	@echo Download go.mod dependencies
-	@go mod download
-
-# Tidy
-tidy:
-	go mod tidy
+tidy download:
+	go mod $@
 
 ./bin/kubelogin: install-tools
 
@@ -33,13 +28,3 @@ aws-auth: bin/kubelogin
 		--role-session-name $(SESSION_NAME) \
 		--web-identity-token $$ID_TOKEN \
 		--region $(AWS_REGION)
-
-# Test
-test:
-	@rm -rf .localized
-	./bin/kustomize localize . .localized
-	KUSTOMIZE_ROOT=.localized PATH=$$(pwd)/bin:$$PATH gotestsum --format testdox --junitfile report.xml -- ./... -count=1
-
-test-cached:
-	test -d .localized || ./bin/kustomize localize . .localized
-	KUSTOMIZE_ROOT=.localized PATH=$$(pwd)/bin:$$PATH gotestsum --format testdox --junitfile report.xml -- ./... -count=1

@@ -23,14 +23,19 @@ jobs:
       - name: Code checkout
         uses: actions/checkout@v4
 
+      # - name: Cache Go dependencies
+      #   uses: actions/cache@v2
+      #   with:
+      #     path: |
+      #       go/pkg/mod
+      #     key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-go-
+
       - uses: actions/setup-go@v4
         with:
           go-version-file: 'go.mod'
-
-      - name: Install tools.go
-        run: |
-          make install-tools
-          export PATH=$(pwd)/bin:$PATH
+          cache-dependency-path: go.sum
 
       # - name: Generate a token
       #   id: generate_token
@@ -46,33 +51,64 @@ jobs:
       #   env:
       #     GH_TOKEN: ${{ steps.generate_token.outputs.token }}
 
-      - name: Localize Manifests (pr)
+      - name: Install tools.go
         run: |
-          mkdir -p .localized/
-          ./bin/kustomize localize . .localized/pr
+          make install-tools
+          for f in bin/*; do
+            sudo cp $f /usr/local/bin
+          done
 
-      - name: Check if build branch exists
-        id: build_branch
-        run: |
-          if git show-ref --quiet refs/heads/build; then
-            echo "exists=yes\n" >> $GITHUB_OUTPUT
-          else
-            echo "exists=no\n" >> $GITHUB_OUTPUT
-          fi
+      # - name: Localize Manifests (pr)
+      #   run: |
+      #     task build
 
-      - uses: actions/checkout@v4
-        if: ${{ steps.build_branch.outputs.exists == 'yes' }}
-        with:
-          ref: 'build'
-          path: ".localized/main"
+      # - name: Check if build branch exists
+      #   id: build_branch
+      #   run: |
+      #     if git show-ref --quiet refs/heads/build; then
+      #       echo "exists=yes\n" >> $GITHUB_OUTPUT
+      #     else
+      #       echo "exists=no\n" >> $GITHUB_OUTPUT
+      #     fi
+
+      # - uses: actions/checkout@v4
+      #   if: ${{ steps.build_branch.outputs.exists == 'yes' }}
+      #   with:
+      #     ref: 'build'
+      #     path: ".build"
+
+      # - uses: actions/checkout@v4
+      #   if: ${{ steps.build_branch.outputs.exists != 'yes' }}
+      #   with:
+      #     ref: 'main'
+      #     path: ".main"
 
       # - name: Localize Manifests (main)
       #   if: ${{ steps.build_branch.outputs.exists != 'yes' }}
       #   run: |
-      #     mkdir -p .localized/
-      #     ./bin/kustomize localize  ${{ github.server_url }}/${{ github.repository }}.git?ref=main .localized/main
+      #     (cd .main/manifests/; task build)
+      #     mv .main/manifests/output .build
 
-      - uses: liatrio/diff-action@main
-        with:
-          base: .localized/main
-          head: .localized/pr
+      # - uses: int128/diff-action@v1
+      #   with:
+      #     base: .build
+      #     head: manifests/output
+
+      # - uses: actions/labeler@v5
+
+      # TODO: use this
+      #
+      # - name: Add Reviewers
+      #   uses: actions/github-script@v2
+      #   with:
+      #     script: |
+      #       const team = 'ghec_deepa_admin';
+      #       const token = process.env.GITHUB_TOKEN;
+      #
+      #       const response = await github.rest.pulls.addReviewers({
+      #         pull_id: context.payload.pull_id,
+      #         team_reviewers: [team],
+      #         token
+      #       });
+      #
+      #       console.log(response);

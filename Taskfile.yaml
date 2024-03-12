@@ -1,0 +1,139 @@
+version: '3'
+
+dotenv:
+- '.env'
+
+tasks:
+  clean:
+    cmds:
+      - rm -rf manifests/output
+
+  build:
+    run: once
+    summary: |
+      Localize all of the clusters into manifests/output/{cluster}.
+      This content ultimately will land in the repository `build` branch
+    deps: [clusters, argo-root]
+
+  copy-tests:
+    run: once
+    dir: ./manifests
+    deps: [build]
+    cmds:
+      - |
+          find clusters argo-root -type f -name "*_test.go" \
+          | while read line; do
+            cp "$line" "output/$line"
+          done
+    #sources:
+    #  - "manifests/clusters/**_test.go"
+    #generates:
+    #  - "manifests/output/clusters/**_test.go"
+
+  test:
+    run: once
+    deps:
+      - task: test-cluster
+        vars: { CLUSTER: 'dev' }
+      - task: test-cluster
+        vars: { CLUSTER: 'prod' }
+      - task: test-cluster
+        vars: { CLUSTER: 'mgmt' }
+      - task: test-argo-root
+
+  test-argo-root:
+    run: when_changed
+    dir: ./manifests/output/argo-root/
+    deps: [copy-tests]
+    cmds:
+      - gotestsum --format testdox --junitfile report.xml -- ./... -count=1 -parallel 10
+
+  test-cluster:
+    run: when_changed
+    prefix: 'test-cluster-{{.CLUSTER}}'
+    summary: |
+      Copy the go tests into the build branch and run them.
+    deps: [copy-tests]
+    dir: ./manifests/output/clusters/{{.CLUSTER}}
+    cmds:
+      - echo "Testing Cluster {{.CLUSTER}}"
+      - gotestsum --format testdox --junitfile report.xml -- ./... -count=1 -skip '^TestAWS.*' -parallel 10
+
+  # Build
+  argo-root:
+    run: when_changed
+    deps: [clusters]
+    cmds:
+      # Copy the directory over, build against the localized stuff
+      - rm -rf manifests/output/argo-root
+      - cp -r manifests/argo-root manifests/output/argo-root-tmp
+      - defer: rm -rf manifests/output/argo-root-tmp
+      - |
+          kustomize build --enable-exec --enable-alpha-plugins \
+            manifests/output/argo-root-tmp \
+            > manifests/output/argo-root-tmp/manifest.yaml
+
+      # Chop up the manifest into subfiles. Need to do two passes with yq
+      - mkdir -p manifests/output/argo-root
+      - |
+          yq ea '[.]' manifests/output/argo-root-tmp/manifest.yaml \
+          | yq 'group_by(.metadata.labels.cluster) | map(group_by(.metadata.labels.project)) | flatten(1) | .[]' \
+            -s '"manifests/output/argo-root/cluster_" + .[0].metadata.labels.cluster + "_project_" + .[0].metadata.labels.project + ".txt"'
+
+      # Our txt files are arrays of yaml; split them into docs
+      - |
+          for f in manifests/output/argo-root/*.txt; do
+            yq ea '.[] | split_doc' "$f" > $(echo "$f" | sed 's~.txt$~.yaml~')
+            rm "$f"
+          done
+
+      # Build the kustomization.yaml file
+      - cd manifests/output/argo-root/; kustomize create --autodetect
+    status:
+      - test -d manifests/output/argo-root
+
+  clusters:
+    run: once
+    deps:
+      - task: build-cluster
+        vars: { CLUSTER: 'dev' }
+      - task: build-cluster
+        vars: { CLUSTER: 'prod' }
+      - task: build-cluster
+        vars: { CLUSTER: 'mgmt' }
+    cmds:
+      - echo "report.xml" >> manifests/output/.gitignore
+    #sources:
+    #  - manifests/clusters
+    #generates:
+    #  - manifests/output/clusters
+    status:
+      - test -d manifests/output/clusters
+
+  build-cluster:
+    run: when_changed
+    prefix: 'build-cluster-{{.CLUSTER}}'
+    cmds:
+      - echo "Running Localize Cluster {{.CLUSTER}}"
+      - mkdir -p manifests/output/clusters/
+      - rm -rf manifests/output/clusters/{{.CLUSTER}}
+      - kustomize localize manifests/clusters/{{.CLUSTER}} manifests/output/clusters/{{.CLUSTER}}
+    #sources:
+    #  - manifests/clusters/{{.CLUSTER}}
+    #generates:
+    #  - manifests/output/clusters/{{.CLUSTER}}
+    status:
+      - test -d manifests/output/clusters/{{.CLUSTER}}
+
+  # Build
+  poetry-install:
+    cmds:
+      - poetry install --no-root
+
+  pages:
+    cmds:
+      - poetry run mkdocs build
+
+  docs:
+    cmds:
+      - poetry run mkdocs serve
